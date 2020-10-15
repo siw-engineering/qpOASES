@@ -98,24 +98,32 @@ endif("${isSystemDir}" STREQUAL "-1")
 ############################################################
 #################### build and install #####################
 ############################################################
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
+#INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
 
 # compile qpOASES libraries
 FILE(GLOB SRC src/*.cpp)
 
 # library
 ADD_LIBRARY(qpOASES STATIC ${SRC})
-INSTALL(TARGETS qpOASES
+target_include_directories(qpOASES PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+INSTALL(TARGETS qpOASES EXPORT qpOASES
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION lib
+        INCLUDES DESTINATION include
 )
 SET_TARGET_PROPERTIES(
     qpOASES
     PROPERTIES
     SOVERSION ${PACKAGE_SO_VERSION}
+    POSITION_INDEPENDENT_CODE ON
     )
 
+install(EXPORT qpOASES
+        FILE qpOASESConfig.cmake
+        DESTINATION ${CMAKE_INSTALL_PREFIX})
 # headers
 INSTALL(FILES include/qpOASES.hpp
   DESTINATION include)
